@@ -14,6 +14,7 @@ import java.util.Map;
 
 @Configuration
 public class MetricsConfig {
+    private static final String STUDENT_NAME = "wisdananes"; 
     @Bean
     public CloudWatchAsyncClient cloudWatchAsyncClient() {
         return CloudWatchAsyncClient
@@ -35,7 +36,7 @@ public class MetricsConfig {
     private CloudWatchConfig setupCloudWatchConfig() {
         return new CloudWatchConfig() {
             private Map<String, String> configuration = Map.of(
-                    "cloudwatch.namespace", "",
+                    "cloudwatch.namespace", STUDENT_NAME,
                     "cloudwatch.step", Duration.ofSeconds(5).toString());
 
             @Override

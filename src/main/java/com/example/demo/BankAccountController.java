@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,9 +100,28 @@ public class BankAccountController implements ApplicationListener<ApplicationRea
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
         Gauge.builder("account_count", theBank,
                 b -> b.values().size()).register(meterRegistry);
+        // This meter type "Gauge" reports the total amount of money in the bank
+        Gauge.builder("bank_sum", theBank,
+                        b -> b.values()
+                                .stream()
+                                .map(Account::getBalance)
+                                .mapToDouble(BigDecimal::doubleValue)
+                                .sum())
+                .register(meterRegistry);
     }
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "account not found")
     public static class AccountNotFoundException extends RuntimeException {
     }
+    @PostMapping(path = "/account/deposit/{accountId}", consumes = "application/json")
+    public ResponseEntity<Account> deposit(@PathVariable String accountId, @RequestBody Map<String, Double> body) {
+        double amount = body.getOrDefault("amount", 0.0);
+        Account account = getOrCreateAccount(accountId);
+        account.setBalance(account.getBalance().add(BigDecimal.valueOf(amount)));
+
+        meterRegistry.counter("deposit_total", "currency", account.getCurrency()).increment(amount);
+
+        return ResponseEntity.ok(account);
+    }
+
 }
