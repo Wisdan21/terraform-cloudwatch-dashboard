@@ -1,5 +1,5 @@
 .terraform
-.idea
+.idea/
 /shelf/
 /workspace.xml
 /httpRequests/
