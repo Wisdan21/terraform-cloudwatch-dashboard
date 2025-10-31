@@ -1,0 +1,15 @@
+.terraform
+.idea
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+/vcs.xml
+
+# AWS CLI local config
+.config
+.credentials
+
+# Java / Spring Boot
+target/
